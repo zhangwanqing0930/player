@@ -38,7 +38,7 @@ void playSdlVideo(VideoProcessor& vProcessor, AudioProcessor* audio = nullptr) {
 
     SDL_Window* screen;
     // SDL 2.0 Support for multiple windows
-    screen = SDL_CreateWindow("Simplest Video Play SDL2", SDL_WINDOWPOS_UNDEFINED,
+    screen = SDL_CreateWindow("Player_window", SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED, width / 2, height / 2,
         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (!screen) {

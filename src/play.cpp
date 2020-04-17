@@ -13,7 +13,6 @@ extern void playSdlAudio(SDL_AudioDeviceID& audioDeviceID, AudioProcessor& aProc
 extern void playSdlVideo(VideoProcessor& vProcessor, AudioProcessor* audio = nullptr);
 
 namespace {
-
     using namespace ffmpegUtil;
 
     void readPacket(PacketGrabber& pGrabber, AudioProcessor* aProcessor, VideoProcessor* vProcessor) {
