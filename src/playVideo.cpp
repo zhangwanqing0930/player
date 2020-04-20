@@ -8,7 +8,7 @@ extern "C" {
 using std::cout;
 using std::endl;
 
-// Refresh Event
+// SDL events
 #define REFRESH_EVENT (SDL_USEREVENT + 1)
 
 #define BREAK_EVENT (SDL_USEREVENT + 3)
@@ -36,31 +36,27 @@ void playSdlVideo(VideoProcessor& vProcessor, AudioProcessor* audio = nullptr) {
     auto width = vProcessor.getWidth();
     auto height = vProcessor.getHeight();
 
-    SDL_Window* screen;
-    // SDL 2.0 Support for multiple windows
-    screen = SDL_CreateWindow("Player_window", SDL_WINDOWPOS_UNDEFINED,
+    //create window
+    SDL_Window* window;
+    window = SDL_CreateWindow("Player_window", SDL_WINDOWPOS_UNDEFINED,
         SDL_WINDOWPOS_UNDEFINED, width / 2, height / 2,
         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
-    if (!screen) {
-        string errMsg = "SDL create window failed ! ";
+    if (!window) {
+        string errMsg = "SDL_CreateWindow failed ! ";
         errMsg += SDL_GetError();
         cout << errMsg << endl;
         throw std::runtime_error(errMsg);
     }
 
-    SDL_Renderer* sdlRenderer = SDL_CreateRenderer(screen, -1, 0);
+    //create renderer
+    SDL_Renderer* sdlRenderer = SDL_CreateRenderer(window, -1, 0);
 
-    // IYUV: Y + U + V  (3 planes)
-    // YV12: Y + V + U  (3 planes)
+    //create testure
     Uint32 pixformat = SDL_PIXELFORMAT_IYUV;
+    SDL_Texture* sdlTexture = SDL_CreateTexture(sdlRenderer, pixformat, SDL_TEXTUREACCESS_STREAMING, width, height);
 
-    SDL_Texture* sdlTexture =
-        SDL_CreateTexture(sdlRenderer, pixformat, SDL_TEXTUREACCESS_STREAMING, width, height);
-    // Use this function to update a rectangle within a planar
-    // YV12 or IYUV texture with new pixel data.
     SDL_Event event;
     auto frameRate = vProcessor.getFrameRate();
-    cout << "frame rate [" << frameRate << "]" << endl;
 
     bool exitRefresh = false;
     bool faster = false;
@@ -75,6 +71,7 @@ void playSdlVideo(VideoProcessor& vProcessor, AudioProcessor* audio = nullptr) {
                 continue;  // skip REFRESH event.
             }
 
+            //sync video and audio
             if (audio != nullptr) {
                 auto vTs = vProcessor.getPts();
                 auto aTs = audio->getPts();
@@ -97,23 +94,15 @@ void playSdlVideo(VideoProcessor& vProcessor, AudioProcessor* audio = nullptr) {
                 }
             }
 
-            // Use this function to update a rectangle within a planar
-            // YV12 or IYUV texture with new pixel data.
             AVFrame* frame = vProcessor.getFrame();
-
             if (frame != nullptr) {
-                SDL_UpdateYUVTexture(sdlTexture,  // the texture to update
-                    NULL,        // a pointer to the rectangle of pixels to update, or
-                                 // NULL to update the entire texture
-                    frame->data[0],      // the raw pixel data for the Y plane
-                    frame->linesize[0],  // the number of bytes between rows of pixel
-                                       // data for the Y plane
-                    frame->data[1],      // the raw pixel data for the U plane
-                    frame->linesize[1],  // the number of bytes between rows of pixel
-                                       // data for the U plane
-                    frame->data[2],      // the raw pixel data for the V plane
-                    frame->linesize[2]   // the number of bytes between rows of pixel
-                                       // data for the V plane
+                SDL_UpdateYUVTexture(sdlTexture, NULL,       
+                    // Y
+                    frame->data[0], frame->linesize[0], 
+                    // U
+                    frame->data[1], frame->linesize[1], 
+                    // V
+                    frame->data[2], frame->linesize[2]   
                 );
                 SDL_RenderClear(sdlRenderer);
                 SDL_RenderCopy(sdlRenderer, sdlTexture, NULL, NULL);

@@ -8,15 +8,14 @@ extern "C" {
 using std::cout;
 using std::endl;
 
+// audio callback function
 void sdlAudioCallback(void* userdata, Uint8* stream, int len) {
     AudioProcessor* receiver = (AudioProcessor*)userdata;
     receiver->writeAudioData(stream, len);
 }
 
 void playSdlAudio(SDL_AudioDeviceID& audioDeviceID, AudioProcessor& aProcessor) {
-    //--------------------- GET SDL audio READY -------------------
 
-    // audio specs containers
     SDL_AudioSpec wanted_specs;
     SDL_AudioSpec specs;
 
@@ -48,25 +47,22 @@ void playSdlAudio(SDL_AudioDeviceID& audioDeviceID, AudioProcessor& aProcessor) 
 
     // open audio device
     audioDeviceID = SDL_OpenAudioDevice(nullptr, 0, &wanted_specs, &specs, 0);
-
-    // SDL_OpenAudioDevice returns a valid device ID that is > 0 on success or 0 on failure
     if (audioDeviceID == 0) {
-        string errMsg = "Failed to open audio device:";
+        string errMsg = "SDL_OpenAudioDevice failed!";
         errMsg += SDL_GetError();
         cout << errMsg << endl;
         throw std::runtime_error(errMsg);
     }
 
+    // prints
+    cout << "------------------------- wanted_specs info: --------------------------" << endl;
     cout << "wanted_specs.freq:" << wanted_specs.freq << endl;
-    // cout << "wanted_specs.format:" << wanted_specs.format << endl;
     std::printf("wanted_specs.format: Ox%X\n", wanted_specs.format);
     cout << "wanted_specs.channels:" << (int)wanted_specs.channels << endl;
     cout << "wanted_specs.samples:" << (int)wanted_specs.samples << endl;
 
-    cout << "------------------------------------------------" << endl;
-
+    cout << "--------------------------- specs info: -------------------------" << endl;
     cout << "specs.freq:" << specs.freq << endl;
-    // cout << "specs.format:" << specs.format << endl;
     std::printf("specs.format: Ox%X\n", specs.format);
     cout << "specs.channels:" << (int)specs.channels << endl;
     cout << "specs.silence:" << (int)specs.silence << endl;

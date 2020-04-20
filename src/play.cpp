@@ -110,7 +110,6 @@ namespace {
 
 void playVideoWithAudio(const string& inputFile) {
     std::cout << "playVideoWithAudio: " << inputFile << std::endl;
-
     play(inputFile);
 }
 
