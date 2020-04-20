@@ -10,11 +10,8 @@ using std::endl;
 
 // SDL events
 #define REFRESH_EVENT (SDL_USEREVENT + 1)
-
 #define BREAK_EVENT (SDL_USEREVENT + 3)
-
 #define VIDEO_FINISH (SDL_USEREVENT + 4)
-
 
 void refresh(int timeInterval, bool& exitRefresh, bool& faster) {
     while (!exitRefresh) {
@@ -39,7 +36,7 @@ void playSdlVideo(VideoProcessor& vProcessor, AudioProcessor* audio = nullptr) {
     //create window
     SDL_Window* window;
     window = SDL_CreateWindow("Player_window", SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED, width / 2, height / 2,
+        SDL_WINDOWPOS_UNDEFINED, width, height,
         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (!window) {
         string errMsg = "SDL_CreateWindow failed ! ";
@@ -51,7 +48,7 @@ void playSdlVideo(VideoProcessor& vProcessor, AudioProcessor* audio = nullptr) {
     //create renderer
     SDL_Renderer* sdlRenderer = SDL_CreateRenderer(window, -1, 0);
 
-    //create testure
+    //create texture
     Uint32 pixformat = SDL_PIXELFORMAT_IYUV;
     SDL_Texture* sdlTexture = SDL_CreateTexture(sdlRenderer, pixformat, SDL_TEXTUREACCESS_STREAMING, width, height);
 
